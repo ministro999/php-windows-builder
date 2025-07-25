@@ -39,7 +39,13 @@ function Get-PhpSrc {
         Rename-Item -Path "php-src-$ref" -NewName $directory
 
         if ($PhpVersion -like "7.2*") {
-            $mkdistUrl = "https://files.ospanel.io/mkdist.php"
+
+            $repositoryInfo = $env:GITHUB_REPOSITORY -split '/'
+            $owner = $repositoryInfo[0]
+            $repository = $repositoryInfo[1]
+            $gref = $env:GITHUB_REF
+            $branch = $gref -replace 'refs/heads/', ''
+            $mkdistUrl = "https://raw.githubusercontent.com/$owner/$repository/refs/heads/$branch/resources/mkdist.php"
             $mkdistDestinationDir = Join-Path $directoryPath "win32\build"
             $mkdistFilePath = Join-Path $mkdistDestinationDir "mkdist.php"
 
