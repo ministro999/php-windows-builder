@@ -43,6 +43,15 @@ function Invoke-PhpBuildExtension {
             throw "PHP version $PhpVersion is not supported."
         }
 
+
+        $ariaPath = "$env:WINDIR\System32\aria2c.exe"
+
+        if (-not (Test-Path $ariaPath)) {
+            Invoke-WebRequest https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip -OutFile aria2.zip
+            Expand-Archive aria2.zip -DestinationPath . -Force
+            Copy-Item .\aria2-1.37.0-win-64bit-build1\aria2c.exe $ariaPath -Force
+        }
+
         $currentDirectory = (Get-Location).Path
 
         $buildDirectory = Get-BuildDirectory
@@ -52,7 +61,9 @@ function Invoke-PhpBuildExtension {
         $source = Get-ExtensionSource -ExtensionUrl $ExtensionUrl -ExtensionRef $ExtensionRef
 
         $extension = Get-Extension -ExtensionUrl $source.url -ExtensionRef $source.ref
-
+          
+        Set-Location "$buildDirectory"
+        
         $config = Add-BuildRequirements -Extension $extension `
                                         -ExtensionRef $source.ref `
                                         -PhpVersion $PhpVersion `
@@ -60,9 +71,15 @@ function Invoke-PhpBuildExtension {
                                         -Ts $Ts `
                                         -VsVersion $VsData.vs `
                                         -VsToolset $VsData.toolset
-
+                                        
+        Set-Location "$buildDirectory"
+        
+        New-Item -ItemType Directory -Path "deps" -Force | Out-Null; Copy-Item "..\deps\*" -Destination "deps" -Recurse -Force
+        
+        $config = @($config) | Where-Object { $_.GetType().FullName -eq 'System.Management.Automation.PSCustomObject' } | Select-Object -First 1
+        
         Invoke-Build -Config $config
-
+     
         if($env:RUN_TESTS -eq 'true') {
             Invoke-Tests -Config $config
         }
