@@ -13,7 +13,7 @@ Function Add-OciSdk {
     begin {
     }
     process {
-        $url = "https://https://raw.githubusercontent.com/OSPanel/php-windows-builder/refs/heads/master/resources/instantclient.zip"
+        $url = "https://raw.githubusercontent.com/OSPanel/php-windows-builder/refs/heads/master/resources/instantclient.zip"
         Invoke-WebRequest $url -OutFile "instantclient.zip"
         Expand-Archive -Path "instantclient.zip" -DestinationPath "../deps" -Force
         Add-Path -PathItem (Join-Path (Get-Location).Path ../deps)
