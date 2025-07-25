@@ -71,6 +71,7 @@ Function Add-Extension {
         Copy-Item -Path "$extensionBuildDirectory\*.dll" -Destination "$currentDirectory\php-bin\ext" -Force
         Copy-Item -Path "$extensionBuildDirectory\*.lib" -Destination "$currentDirectory\php-dev\lib" -Force
         Add-Content -Path "$currentDirectory\php-bin\php.ini" -Value "extension=$cur_Extension"
+        if (-not (Test-Path "..\pecl\$cur_Extension")) { New-Item -ItemType Directory -Path "..\pecl\$cur_Extension" -Force | Out-Null }; Copy-Item ".\*" -Destination "..\pecl\$cur_Extension" -Recurse -Force
         Set-Location $currentDirectory
         Set-GAGroup end
     }
