@@ -84,10 +84,9 @@ function Get-Extension {
                     Rename-Item -Path $currentDirectory -NewName $name
 
                     Write-Host "Renamed folder:`n$currentDirectory`n→`n$newPath"
-                    # Опционально: перейти в новую папку
                     Set-Location $newPath
                 } catch {
-                    Write-Host "Пропускаем переименование: $_"
+                    Write-Host "Skipping rename: $_"
                 }
             }
 
