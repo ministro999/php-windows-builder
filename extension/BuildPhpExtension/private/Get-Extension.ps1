@@ -91,6 +91,8 @@ function Get-Extension {
                 }
             }
 
+            $extension = Split-Path -Path (Get-Location) -Leaf
+
             $patches = $False
             if(Test-Path -PATH $PSScriptRoot\..\patches\$extension.ps1) {
                 if((Get-Content $PSScriptRoot\..\patches\$extension.ps1).Contains('config.w32')) {
