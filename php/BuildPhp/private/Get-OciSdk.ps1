@@ -12,10 +12,15 @@ function Get-OciSdk {
         [string]$Arch
     )
     begin {
-        $url = "https://raw.githubusercontent.com/OSPanel/php-windows-builder/refs/heads/master/resources/instantclient.zip"
     }
     process {
-        Invoke-WebRequest $url -OutFile "instantclient.zip"
+        $remoteUrl = git config --get remote.origin.url
+        $remoteUrl -match "github\.com[:/](.+?)/(.+?)(\.git)?$" | Out-Null
+        $owner = $matches[1]
+        $repository = $matches[2]
+        $currentBranch = git rev-parse --abbrev-ref HEAD
+        $downloadUrl = "https://raw.githubusercontent.com/$owner/$repository/refs/heads/$currentBranch/resources/instantclient.zip"
+        Invoke-WebRequest $downloadUrl -OutFile "instantclient.zip"
         Expand-Archive -Path "instantclient.zip" -DestinationPath "."      
     }
     end {
