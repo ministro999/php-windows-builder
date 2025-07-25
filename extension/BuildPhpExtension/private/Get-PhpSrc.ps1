@@ -38,7 +38,7 @@ function Get-PhpSrc {
         [System.IO.Compression.ZipFile]::ExtractToDirectory($zipFilePath, $currentDirectory)
         Rename-Item -Path "php-src-$ref" -NewName $directory
         
-        if ($PhpVersion -eq "7.2.34") {
+        if ($PhpVersion -like "7.2*") {
             $mkdistUrl = "https://files.ospanel.io/mkdist.php"
             $mkdistDestinationDir = Join-Path $directoryPath "win32\build"
             $mkdistFilePath = Join-Path $mkdistDestinationDir "mkdist.php"
