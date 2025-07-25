@@ -14,12 +14,12 @@ function Get-OciSdk {
     begin {
     }
     process {
-        $remoteUrl = git config --get remote.origin.url
-        $remoteUrl -match "github\.com[:/](.+?)/(.+?)(\.git)?$" | Out-Null
-        $owner = $matches[1]
-        $repository = $matches[2]
-        $currentBranch = git rev-parse --abbrev-ref HEAD
-        $downloadUrl = "https://raw.githubusercontent.com/$owner/$repository/refs/heads/$currentBranch/resources/instantclient.zip"
+        $repositoryInfo = $env:GITHUB_REPOSITORY -split '/'
+        $owner = $repositoryInfo[0]
+        $repository = $repositoryInfo[1]
+        $ref = $env:GITHUB_REF
+        $branch = $ref -replace 'refs/heads/', ''
+        $downloadUrl = "https://raw.githubusercontent.com/$owner/$repository/refs/heads/$branch/resources/instantclient.zip"
         Invoke-WebRequest $downloadUrl -OutFile "instantclient.zip"
         Expand-Archive -Path "instantclient.zip" -DestinationPath "."      
     }
