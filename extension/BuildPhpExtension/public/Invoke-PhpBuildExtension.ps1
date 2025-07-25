@@ -43,15 +43,6 @@ function Invoke-PhpBuildExtension {
             throw "PHP version $PhpVersion is not supported."
         }
 
-
-        $ariaPath = "$env:WINDIR\System32\aria2c.exe"
-
-        if (-not (Test-Path $ariaPath)) {
-            Invoke-WebRequest https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip -OutFile aria2.zip
-            Expand-Archive aria2.zip -DestinationPath . -Force
-            Copy-Item .\aria2-1.37.0-win-64bit-build1\aria2c.exe $ariaPath -Force
-        }
-
         $currentDirectory = (Get-Location).Path
 
         $buildDirectory = Get-BuildDirectory
