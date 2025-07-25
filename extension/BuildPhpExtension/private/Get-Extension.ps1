@@ -25,7 +25,7 @@ function Get-Extension {
             ) {
                 throw "Both Extension URL and Extension Reference are required."
             }
-
+                    $currentDirectory = (Get-Location).Path
                     $extension = Split-Path -Path $ExtensionUrl -Leaf
                     $extensionPath = Join-Path -Path $currentDirectory -ChildPath $extension
 
