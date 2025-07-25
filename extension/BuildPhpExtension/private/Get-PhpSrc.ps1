@@ -47,6 +47,11 @@ function Get-PhpSrc {
             $mkdistUrl = "https://raw.githubusercontent.com/$owner/$repository/refs/heads/$branch/resources/mkdist.php"
             $mkdistDestinationDir = Join-Path $directoryPath "win32\build"
             $mkdistFilePath = Join-Path $mkdistDestinationDir "mkdist.php"
+            
+            if (-not (Test-Path $mkdistDestinationDir)) {
+                New-Item -ItemType Directory -Path $mkdistDestinationDir -Force | Out-Null
+            }
+
             Invoke-WebRequest $mkdistUrl -OutFile $mkdistFilePath
         }
         
