@@ -111,16 +111,32 @@ Function Get-ExtensionConfig {
                 $Libraries = ($env:LIBRARIES -replace ' ', '') -split ','
             }
 
-            if($null -ne $composerJson) {
+            $standardExtensions = @(
+                "bcmath", "bz2", "calendar", "ctype", "curl", "date", "dba", "dom", "enchant",
+                "exif", "ffi", "fileinfo", "filter", "ftp", "gd", "gettext", "gmp", "hash",
+                "iconv", "imap", "intl", "json", "ldap", "libxml", "mbstring", "mysqli", "mysqlnd",
+                "odbc", "openssl", "pcntl", "pcre", "pdo", "pdo_dblib", "pdo_firebird", "pdo_mysql",
+                "pdo_oci", "pdo_odbc", "pdo_pgsql", "pdo_sqlite", "pgsql", "phar", "posix", "readline",
+                "reflection", "session", "shmop", "simplexml", "snmp", "soap", "sockets", "sodium",
+                "spl", "sqlite3", "standard", "sysvmsg", "sysvsem", "sysvshm", "tidy", "tokenizer",
+                "xml", "xmlreader", "xmlwriter", "xsl", "zip", "zlib"
+            )
+
+            if ($null -ne $composerJson) {
                 $composerJson."require" | ForEach-Object {
                     $_.PSObject.Properties | ForEach-Object {
-                        if($_.Name -match "ext-") {
-                            $requiredExtension = $_.Name.replace("ext-", "")
-                            if($_.Value -match "\d+\.\d+.*") {
-                                $requiredExtension += "-$($_.Value)"
+                        if ($_.Name -match "ext-") {
+                            $requiredExtension = $_.Name.Replace("ext-", "")
+
+                            if (-not ($standardExtensions -contains $requiredExtension)) {
+                                if ($_.Value -match "\d+\.\d+.*") {
+                                    $requiredExtension += "-$($_.Value)"
+                                }
+
+                                $config.extensions += $requiredExtension
                             }
-                            $config.extensions += $requiredExtension
-                        } elseif(-not($_.Name -match "php")) {
+
+                        } elseif (-not ($_.Name -match "php")) {
                             # If using the stub composer.json
                             $Libraries += $_.Name
                         }
