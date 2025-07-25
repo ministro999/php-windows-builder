@@ -12,7 +12,7 @@ function Get-OciSdk {
         [string]$Arch
     )
     begin {
-        $url = "https://https://raw.githubusercontent.com/OSPanel/php-windows-builder/refs/heads/master/resources/instantclient.zip"
+        $url = "https://raw.githubusercontent.com/OSPanel/php-windows-builder/refs/heads/master/resources/instantclient.zip"
     }
     process {
         Invoke-WebRequest $url -OutFile "instantclient.zip"
