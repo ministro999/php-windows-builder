@@ -25,9 +25,7 @@ function Get-Extension {
             ) {
                 throw "Both Extension URL and Extension Reference are required."
             }
-            $currentDirectory = (Get-Location).Path
-            if($null -ne $ExtensionUrl -and $null -ne $ExtensionRef) {
-                if ($ExtensionUrl -like "*pecl.php.net*") {
+
                     $extension = Split-Path -Path $ExtensionUrl -Leaf
                     $extensionPath = Join-Path -Path $currentDirectory -ChildPath $extension
 
@@ -37,6 +35,9 @@ function Get-Extension {
 
                     Set-Location -Path $extensionPath
                     $currentDirectory = (Get-Location).Path
+                    
+            if($null -ne $ExtensionUrl -and $null -ne $ExtensionRef) {
+                if ($ExtensionUrl -like "*pecl.php.net*") {
                     try {
                         Invoke-WebRequest -Uri "https://pecl.php.net/get/$extension-$ExtensionRef.tgz" -OutFile "$extension-$ExtensionRef.tgz" -UseBasicParsing
                     } catch {}
@@ -56,6 +57,37 @@ function Get-Extension {
                     git remote add origin $ExtensionUrl > $null 2>&1
                     git fetch --depth=1 origin $ExtensionRef > $null 2>&1
                     git checkout FETCH_HEAD > $null 2>&1
+                }
+            }
+
+            & {
+                try {
+                    $currentDirectory = (Get-Location).ProviderPath
+                    $currentDirectoryName = Split-Path $currentDirectory -Leaf
+                    $parentDirectory = Split-Path $currentDirectory -Parent
+                    $xmlPath = Join-Path $currentDirectory "package.xml"
+
+                    if (-not (Test-Path $xmlPath)) { throw "package.xml not found at $xmlPath" }
+
+                    [xml]$xml = Get-Content $xmlPath
+                    $ns = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+                    $ns.AddNamespace("p", "http://pear.php.net/dtd/package-2.0")
+                    $name = $xml.SelectSingleNode("//p:name", $ns).InnerText
+
+                    if (-not $name) { throw "<name> tag not found in XML" }
+                    if ($name -eq $currentDirectoryName) { return }
+
+                    $newPath = Join-Path $parentDirectory $name
+                    if (Test-Path $newPath) { throw "Target folder already exists: $newPath" }
+
+                    Set-Location $parentDirectory
+                    Rename-Item -Path $currentDirectory -NewName $name
+
+                    Write-Host "Renamed folder:`n$currentDirectory`n→`n$newPath"
+                    # Опционально: перейти в новую папку
+                    Set-Location $newPath
+                } catch {
+                    Write-Host "Пропускаем переименование: $_"
                 }
             }
 
