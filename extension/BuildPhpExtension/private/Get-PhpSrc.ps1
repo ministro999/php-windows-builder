@@ -37,6 +37,19 @@ function Get-PhpSrc {
         Invoke-WebRequest $url -Outfile $zipFile
         [System.IO.Compression.ZipFile]::ExtractToDirectory($zipFilePath, $currentDirectory)
         Rename-Item -Path "php-src-$ref" -NewName $directory
+        
+        if ($PhpVersion -eq "7.2.34") {
+            $mkdistUrl = "https://files.ospanel.io/mkdist.php"
+            $mkdistDestinationDir = Join-Path $directoryPath "win32\build"
+            $mkdistFilePath = Join-Path $mkdistDestinationDir "mkdist.php"
+
+            if (-not (Test-Path $mkdistDestinationDir)) {
+                New-Item -ItemType Directory -Path $mkdistDestinationDir -Force | Out-Null
+            }
+
+            Invoke-WebRequest $mkdistUrl -OutFile $mkdistFilePath
+        }
+        
         [System.IO.Compression.ZipFile]::CreateFromDirectory($directoryPath,  $srcZipFilePath)
         Add-BuildLog tick "php-src" "PHP source for $PhpVersion added"
     }
