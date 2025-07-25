@@ -29,6 +29,14 @@ function Get-Extension {
             if($null -ne $ExtensionUrl -and $null -ne $ExtensionRef) {
                 if ($ExtensionUrl -like "*pecl.php.net*") {
                     $extension = Split-Path -Path $ExtensionUrl -Leaf
+                    $extensionPath = Join-Path -Path $currentDirectory -ChildPath $extension
+
+                    if (-not (Test-Path $extensionPath)) {
+                        New-Item -Path $extensionPath -ItemType Directory | Out-Null
+                    }
+
+                    Set-Location -Path $extensionPath
+                    $currentDirectory = (Get-Location).Path
                     try {
                         Invoke-WebRequest -Uri "https://pecl.php.net/get/$extension-$ExtensionRef.tgz" -OutFile "$extension-$ExtensionRef.tgz" -UseBasicParsing
                     } catch {}
