@@ -89,8 +89,8 @@ Function Get-ExtensionConfig {
                 build_directory = ""
             }
             $composerJson = $null
-            if((-not(Test-Path composer.json)) -and (Test-Path $PSScriptRoot\..\config\stubs\$packageName.composer.json)) {
-                Copy-Item $PSScriptRoot\..\config\stubs\$packageName.composer.json composer.json
+            if(Test-Path $PSScriptRoot\..\config\stubs\$Extension.composer.json) {
+                Copy-Item $PSScriptRoot\..\config\stubs\$Extension.composer.json composer.json
             }
             if(Test-Path composer.json) {
                 $composerJson = Get-Content composer.json -Raw | ConvertFrom-Json
